@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ContractCommand</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 6%;
+            background: #17365d;
+            color: white;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .logout-button {
+            padding: 10px 15px;
+            background: white;
+            color: #17365d;
+            border: 0;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome,
+        .module {
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .welcome h2 {
+            margin-top: 0;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .module h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>ContractCommand</h1>
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="logout-button" type="submit">
+                Log out
+            </button>
+        </form>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h2>Welcome, {{ username }}!</h2>
+            <p class="muted">Your ContractCommand workspace</p>
+            <p><strong>Role:</strong> {{ role }}</p>
+            <p>
+                You are successfully logged in. Your contract,
+                procurement, vendor, invoice and payment modules
+                will be added in the upcoming phases.
+            </p>
+        </section>
+
+        <section class="modules">
+            <article class="module">
+                <h3>Contracts</h3>
+                <p class="muted">Manage contract records and lifecycle.</p>
+            </article>
+
+            <article class="module">
+                <h3>Procurement</h3>
+                <p class="muted">Plan future procurement requirements.</p>
+            </article>
+
+            <article class="module">
+                <h3>Vendors</h3>
+                <p class="muted">Maintain vendor profiles and evaluations.</p>
+            </article>
+
+            <article class="module">
+                <h3>Finance</h3>
+                <p class="muted">Track invoices and payments.</p>
+            </article>
+        </section>
+    </main>
+</body>
+
+</html>
