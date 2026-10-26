@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "evaluations",
     "invoices",
     "payments",
+    "reports",
 ]
 
 MIDDLEWARE = [

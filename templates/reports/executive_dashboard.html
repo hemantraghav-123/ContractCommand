@@ -1,0 +1,123 @@
+
+{% extends "contracts/base.html" %}
+
+{% block title %}Executive Dashboard | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Executive Dashboard</h1>
+<p class="muted">
+    Contract, procurement, vendor, and financial overview.
+</p>
+
+<div class="module">
+    <h2>Operational KPIs</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+        <div class="module">
+            <p class="muted">Active contracts</p>
+            <h2>{{ active_contract_count }}</h2>
+            <p>Of {{ contract_count }} non-archived contracts</p>
+        </div>
+
+        <div class="module">
+            <p class="muted">Procurement plans</p>
+            <h2>{{ procurement_plan_count }}</h2>
+            <p>Non-archived plans</p>
+        </div>
+
+        <div class="module">
+            <p class="muted">Active vendors</p>
+            <h2>{{ vendor_count }}</h2>
+            <p>Currently active vendor records</p>
+        </div>
+
+        <div class="module">
+            <p class="muted">Invoices awaiting review</p>
+            <h2>{{ invoice_review_count }}</h2>
+            <p>Submitted or under review</p>
+        </div>
+    </div>
+</div>
+
+<div class="module">
+    <h2>Financial Overview</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+        <div>
+            <p class="muted">Total invoiced</p>
+            <h2>{{ total_invoiced|floatformat:2 }}</h2>
+        </div>
+        <div>
+            <p class="muted">Completed payments</p>
+            <h2>{{ total_paid|floatformat:2 }}</h2>
+        </div>
+        <div>
+            <p class="muted">Outstanding balance</p>
+            <h2>{{ total_outstanding|floatformat:2 }}</h2>
+        </div>
+    </div>
+    <p class="muted">
+        Rejected invoices are excluded. Payment totals are based on
+        recorded payment status, not a live bank connection.
+    </p>
+</div>
+
+<div class="module">
+    <h2>Contracts by Status</h2>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Contract count</th>
+                    <th>Total contract value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in contract_status_rows %}
+                    <tr>
+                        <td>{{ row.status }}</td>
+                        <td>{{ row.count }}</td>
+                        <td>{{ row.value|default:0|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3">No contract records.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="module">
+    <h2>Procurement Budget by Priority</h2>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Priority</th>
+                    <th>Plan count</th>
+                    <th>Estimated budget</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in procurement_priority_rows %}
+                    <tr>
+                        <td>{{ row.priority }}</td>
+                        <td>{{ row.count }}</td>
+                        <td>{{ row.budget|default:0|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3">No procurement plans.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="module">
+    <h2>Export Reports</h2>
+    <p>Download CSV files to review in Excel or another spreadsheet application.</p>
+    <p><a href="{% url 'reports:export_contracts' %}">Export contracts CSV</a></p>
+    <p><a href="{% url 'reports:export_invoices' %}">Export invoices CSV</a></p>
+</div>
+
+<p><a href="{% url 'dashboard' %}">Back to main dashboard</a></p>
+{% endblock %}
