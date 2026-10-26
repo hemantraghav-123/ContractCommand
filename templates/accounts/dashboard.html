@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dashboard | ContractCommand</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -15,6 +17,7 @@
             font-family: Arial, sans-serif;
             background: #f1f5f9;
             color: #172033;
+            line-height: 1.6;
         }
 
         header {
@@ -32,6 +35,10 @@
             font-size: 22px;
         }
 
+        .logout-form {
+            margin: 0;
+        }
+
         .logout-button {
             padding: 10px 15px;
             background: white;
@@ -40,6 +47,11 @@
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .logout-button:hover {
+            background: #e2e8f0;
         }
 
         main {
@@ -58,6 +70,11 @@
 
         .welcome h2 {
             margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            margin: 10px 0;
         }
 
         .muted {
@@ -66,23 +83,88 @@
 
         .modules {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit,
+                    minmax(min(220px, 100%), 1fr));
             gap: 18px;
             margin-top: 22px;
         }
 
+        .module {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .module h3 {
             margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .module p {
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        .module a {
+            display: inline-block;
+            margin-top: auto;
+            color: #1d4ed8;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .module a:hover {
+            text-decoration: underline;
+        }
+
+        .module-status {
+            display: inline-block;
+            margin-top: auto;
+            padding: 5px 10px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 16px 20px;
+            }
+
+            header h1 {
+                font-size: 19px;
+            }
+
+            main {
+                margin: 24px auto;
+                padding: 0 16px;
+            }
+
+            .welcome,
+            .module {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
+
     <header>
         <h1>ContractCommand</h1>
 
-        <form method="post" action="{% url 'logout' %}">
+        <form class="logout-form" method="post" action="{% url 'logout' %}">
             {% csrf_token %}
+
             <button class="logout-button" type="submit">
                 Log out
             </button>
@@ -90,39 +172,143 @@
     </header>
 
     <main>
+
+        <!-- Welcome Section -->
         <section class="welcome">
             <h2>Welcome, {{ username }}!</h2>
-            <p class="muted">Your ContractCommand workspace</p>
-            <p><strong>Role:</strong> {{ role }}</p>
+
+            <p class="muted">
+                Your ContractCommand procurement and contract management workspace.
+            </p>
+
             <p>
-                You are successfully logged in. Your contract,
-                procurement, vendor, invoice and payment modules
-                will be added in the upcoming phases.
+                <strong>Role:</strong>
+                {{ role }}
+            </p>
+
+            <p>
+                You are successfully logged in. Use the modules below
+                to access the available features of ContractCommand.
+                Your access to management operations depends on your
+                assigned role and permissions.
             </p>
         </section>
 
+        <!-- Application Modules -->
         <section class="modules">
+
+            <!-- Contracts Module -->
             <article class="module">
                 <h3>Contracts</h3>
-                <p class="muted">Manage contract records and lifecycle.</p>
+
+                <p class="muted">
+                    Create, review, search, update, and manage contract
+                    records throughout their lifecycle.
+                </p>
+
+                <a href="{% url 'contracts:list' %}">
+                    Open Contract Repository &rarr;
+                </a>
             </article>
 
+            <!-- Procurement Module -->
             <article class="module">
                 <h3>Procurement</h3>
-                <p class="muted">Plan future procurement requirements.</p>
+
+                <p class="muted">
+                    Plan procurement requirements, manage budgets,
+                    and track purchasing priorities.
+                </p>
+
+                <span class="module-status">
+                    Coming in a later phase
+                </span>
             </article>
 
+            <!-- Vendors Module -->
             <article class="module">
                 <h3>Vendors</h3>
-                <p class="muted">Maintain vendor profiles and evaluations.</p>
+
+                <p class="muted">
+                    Maintain vendor profiles and support vendor
+                    qualification and evaluation.
+                </p>
+
+                <span class="module-status">
+                    Coming in a later phase
+                </span>
+            </article>
+
+            <!-- Finance Module -->
+            <article class="module">
+                <h3>Finance</h3>
+
+                <p class="muted">
+                    Track contract invoices, payment records,
+                    and financial processing.
+                </p>
+
+                <span class="module-status">
+                    Coming in a later phase
+                </span>
+            </article>
+
+
+            <article class="module">
+                <h3>Procurement Planning</h3>
+                <p class="muted">
+                    Plan requirements, monitor estimated budgets, and track priorities.
+                </p>
+                <a href="{% url 'procurement:list' %}">
+                    Open Procurement Plans
+                </a>
+            </article>
+
+
+            <article class="module">
+                <h3>Vendor Management</h3>
+                <p class="muted">
+                    Register suppliers, review qualifications, and maintain vendor profiles.
+                </p>
+                <a href="{% url 'vendors:list' %}">Open Vendor Repository</a>
             </article>
 
             <article class="module">
-                <h3>Finance</h3>
-                <p class="muted">Track invoices and payments.</p>
+                <h3>Vendor Evaluation</h3>
+                <p class="muted">
+                    Score vendors and compare evaluation results for procurement plans.
+                </p>
+                <a href="{% url 'evaluations:list' %}">Open Evaluations</a>
             </article>
+
+            
+<article class="module">
+    <h3>Invoice Management</h3>
+    <p class="muted">
+        Submit invoices, review approvals, and track outstanding balances.
+    </p>
+    <a href="{% url 'invoices:list' %}">Open Invoices</a>
+</article>
+
+<article class="module">
+    <h3>Payment Management</h3>
+    <p class="muted">
+        Record payment references and confirm completed payments.
+    </p>
+    <a href="{% url 'payments:list' %}">Open Payments</a>
+</article>
+
+
+
+
         </section>
+
     </main>
+
+    <footer>
+        &copy; {% now "Y" %} ContractCommand. All rights reserved.
+    </footer>
+
 </body>
 
 </html>
