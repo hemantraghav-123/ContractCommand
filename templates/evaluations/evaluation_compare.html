@@ -1,0 +1,53 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}Vendor Comparison | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Vendor Comparison</h1>
+<p><strong>Procurement plan:</strong> {{ plan.title }}</p>
+
+<p class="muted">
+    Ranked by weighted evaluation score. Review the individual criteria
+    and applicable procurement requirements before making a decision.
+</p>
+
+{% if rows %}
+<div class="module" style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Vendor</th>
+                <th>Technical (40%)</th>
+                <th>Financial (25%)</th>
+                <th>Delivery (20%)</th>
+                <th>Compliance (15%)</th>
+                <th>Weighted score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ row.evaluation.vendor.name }}</td>
+                <td>{{ row.evaluation.technical_score }}</td>
+                <td>{{ row.evaluation.financial_score }}</td>
+                <td>{{ row.evaluation.delivery_score }}</td>
+                <td>{{ row.evaluation.compliance_score }}</td>
+                <td><strong>{{ row.score|floatformat:2 }}/100</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="module">
+    <p>No vendors have been evaluated for this plan yet.</p>
+    <a href="{% url 'evaluations:create' %}?plan={{ plan.pk }}">
+        Evaluate a vendor
+    </a>
+</div>
+{% endif %}
+
+<p><a href="{% url 'evaluations:list' %}">Back to evaluations</a></p>
+{% endblock %}

@@ -1,0 +1,57 @@
+
+{% extends "contracts/base.html" %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Invoice {{ invoice.invoice_number }}</h1>
+
+<div class="module">
+    <p><strong>Contract:</strong> {{ invoice.contract.contract_number }} — {{ invoice.contract.title }}</p>
+    <p><strong>Vendor:</strong> {{ invoice.contract.vendor.name }}</p>
+    <p><strong>Amount:</strong> {{ invoice.amount|floatformat:2 }}</p>
+    <p><strong>Invoice date:</strong> {{ invoice.invoice_date }}</p>
+    <p><strong>Due date:</strong> {{ invoice.due_date|default:"Not set" }}</p>
+    <p><strong>Status:</strong> {{ invoice.get_status_display }}</p>
+    <p><strong>Paid:</strong> {{ paid_total|floatformat:2 }}</p>
+    <p><strong>Outstanding:</strong> {{ balance|floatformat:2 }}</p>
+    <h3>Description</h3>
+    <p>{{ invoice.description|default:"No description provided."|linebreaksbr }}</p>
+
+    {% if can_manage_finance and invoice.status == "SUBMITTED" %}
+        <form method="post" action="{% url 'invoices:action' invoice.pk 'review' %}">
+            {% csrf_token %}
+            <button type="submit">Mark under review</button>
+        </form>
+    {% endif %}
+
+    {% if can_manage_finance and invoice.status == "UNDER_REVIEW" or can_manage_finance and invoice.status == "SUBMITTED" %}
+        <form method="post" action="{% url 'invoices:action' invoice.pk 'approve' %}">
+            {% csrf_token %}
+            <button type="submit">Approve invoice</button>
+        </form>
+        <form method="post" action="{% url 'invoices:action' invoice.pk 'reject' %}">
+            {% csrf_token %}
+            <button type="submit">Reject invoice</button>
+        </form>
+    {% endif %}
+</div>
+
+<div class="module">
+    <h2>Payments</h2>
+    {% for payment in payments %}
+        <p>
+            <strong>{{ payment.reference }}</strong> —
+            {{ payment.amount|floatformat:2 }} —
+            {{ payment.get_status_display }}
+        </p>
+    {% empty %}
+        <p>No payments recorded.</p>
+    {% endfor %}
+    {% if can_manage_finance and invoice.status == "APPROVED" or can_manage_finance and invoice.status == "PARTIALLY_PAID" %}
+        <a href="{% url 'payments:create' %}">Record a payment</a>
+    {% endif %}
+</div>
+
+<p><a href="{% url 'invoices:list' %}">Back to invoices</a></p>
+{% endblock %}

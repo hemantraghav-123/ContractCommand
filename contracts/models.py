@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 
 from django.conf import settings
 from django.db import models
@@ -19,10 +21,12 @@ class Contract(models.Model):
         MAINTENANCE = "MAINTENANCE", "Maintenance"
         RESEARCH = "RESEARCH", "Research and Development"
         OTHER = "OTHER", "Other"
+        
 
     contract_number = models.CharField(max_length=50, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    
 
     vendor = models.ForeignKey(
         "vendors.Vendor",
@@ -45,9 +49,10 @@ class Contract(models.Model):
     )
 
     contract_value = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-    )
+    max_digits=15,
+    decimal_places=2,
+    validators=[MinValueValidator(0.01)],
+)
 
     start_date = models.DateField()
     end_date = models.DateField()
@@ -63,13 +68,24 @@ class Contract(models.Model):
         on_delete=models.PROTECT,
         related_name="managed_contracts",
     )
-
+    is_archived = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
 
+    def clean(self):
+        super().clean()
+
+        if self.start_date and self.end_date:
+            if self.end_date < self.start_date:
+                raise ValidationError({
+                    "end_date": "End date cannot be before start date."
+                })
+
     def __str__(self):
         return f"{self.contract_number} - {self.title}"
+      
 

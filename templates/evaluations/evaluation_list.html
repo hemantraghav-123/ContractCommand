@@ -1,0 +1,68 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}Vendor Evaluations | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Vendor Evaluations</h1>
+<p class="muted">
+    Compare vendor scores for procurement requirements.
+</p>
+
+<form method="get" class="module">
+    <label for="plan">Procurement plan</label>
+    <select id="plan" name="plan">
+        <option value="">All procurement plans</option>
+        {% for plan in plans %}
+        {% if selected_plan == plan.pk|stringformat:"s" %}
+        <option value="{{ plan.pk }}" selected>{{ plan.title }}</option>
+        {% else %}
+        <option value="{{ plan.pk }}">{{ plan.title }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+{% if can_manage %}
+<p><a href="{% url 'evaluations:create' %}">+ Evaluate vendor</a></p>
+{% endif %}
+
+<div class="module" style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Vendor</th>
+                <th>Procurement plan</th>
+                <th>Technical</th>
+                <th>Financial</th>
+                <th>Delivery</th>
+                <th>Compliance</th>
+                <th>Weighted score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.evaluation.vendor.name }}</td>
+                <td>
+                    {{ row.evaluation.procurement_plan.title }}
+                    <br>
+                    <a href="{% url 'evaluations:compare' row.evaluation.procurement_plan_id %}">
+                        Compare for this plan
+                    </a>
+                </td>
+                <td>{{ row.evaluation.technical_score }}</td>
+                <td>{{ row.evaluation.financial_score }}</td>
+                <td>{{ row.evaluation.delivery_score }}</td>
+                <td>{{ row.evaluation.compliance_score }}</td>
+                <td><strong>{{ row.score|floatformat:2 }}/100</strong></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No evaluations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

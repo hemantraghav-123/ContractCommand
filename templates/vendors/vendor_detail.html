@@ -1,0 +1,32 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}{{ vendor.name }} | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>{{ vendor.name }}</h1>
+
+<div class="module">
+    <p><strong>Vendor code:</strong> {{ vendor.vendor_code }}</p>
+    <p><strong>Category:</strong> {{ vendor.category }}</p>
+    <p><strong>Country:</strong> {{ vendor.country }}</p>
+    <p><strong>Contact person:</strong> {{ vendor.contact_person|default:"Not provided" }}</p>
+    <p><strong>Email:</strong> {{ vendor.email|default:"Not provided" }}</p>
+    <p><strong>Phone:</strong> {{ vendor.phone|default:"Not provided" }}</p>
+    <p><strong>Address:</strong> {{ vendor.address|default:"Not provided"|linebreaksbr }}</p>
+    <p><strong>Qualification:</strong> {{ vendor.get_qualification_status_display }}</p>
+    <p><strong>Activity:</strong> {% if vendor.is_active %}Active{% else %}Inactive{% endif %}</p>
+
+    {% if can_manage %}
+    <p><a href="{% url 'vendors:update' vendor.pk %}">Edit vendor</a></p>
+
+    {% if vendor.is_active %}
+    <form method="post" action="{% url 'vendors:deactivate' vendor.pk %}">
+        {% csrf_token %}
+        <button type="submit">Deactivate vendor</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+    <p><a href="{% url 'vendors:list' %}">Back to vendors</a></p>
+</div>
+{% endblock %}

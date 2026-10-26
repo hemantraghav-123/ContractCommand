@@ -1,0 +1,44 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}{{ plan.title }} | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>{{ plan.title }}</h1>
+
+<div class="module">
+    <p><strong>Department:</strong> {{ plan.department }}</p>
+    <p>
+        <strong>Estimated budget:</strong>
+        {{ plan.estimated_budget|floatformat:2 }}
+    </p>
+    <p><strong>Priority:</strong> {{ plan.get_priority_display }}</p>
+    <p><strong>Status:</strong> {{ plan.get_status_display }}</p>
+    <p>
+        <strong>Expected date:</strong>
+        {{ plan.expected_date|default:"Not set" }}
+    </p>
+    <p>
+        <strong>Created by:</strong>
+        {{ plan.created_by|default:"Not recorded" }}
+    </p>
+
+    <h3>Requirement description</h3>
+    <p>{{ plan.requirement_description|linebreaksbr }}</p>
+
+    {% if can_manage %}
+    <p>
+        <a href="{% url 'procurement:update' plan.pk %}">
+            Edit plan
+        </a>
+    </p>
+
+    <form method="post" action="{% url 'procurement:archive' plan.pk %}"
+        onsubmit="return confirm('Archive this procurement plan?');">
+        {% csrf_token %}
+        <button type="submit">Archive plan</button>
+    </form>
+    {% endif %}
+
+    <p><a href="{% url 'procurement:list' %}">Back to procurement plans</a></p>
+</div>
+{% endblock %}

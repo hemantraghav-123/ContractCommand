@@ -1,0 +1,107 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}Procurement Plans | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Procurement Planning</h1>
+<p class="muted">
+    Plan procurement requirements, track budgets, and prepare for contracts.
+</p>
+
+<div class="module">
+    <p class="muted">Estimated budget for current results</p>
+    <h2>{{ total_budget|floatformat:2 }}</h2>
+</div>
+
+<form method="get" class="module">
+    <label for="q">Search</label>
+    <input id="q" type="search" name="q" value="{{ query }}" placeholder="Search title, department, or requirement">
+
+    <label for="priority">Priority</label>
+    <select id="priority" name="priority">
+        <option value="">All priorities</option>
+        {% for value, label in priority_choices %}
+        {% if selected_priority == value %}
+        <option value="{{ value }}" selected>{{ label }}</option>
+        {% else %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
+
+    <label for="status">Status</label>
+    <select id="status" name="status">
+        <option value="">All statuses</option>
+        {% for value, label in status_choices %}
+        {% if selected_status == value %}
+        <option value="{{ value }}" selected>{{ label }}</option>
+        {% else %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
+
+    <button type="submit">Apply filters</button>
+    <a href="{% url 'procurement:list' %}">Clear filters</a>
+</form>
+
+{% if can_manage %}
+<p>
+    <a href="{% url 'procurement:create' %}">+ Create procurement plan</a>
+</p>
+{% endif %}
+
+<div class="module">
+    {% if plans %}
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Department</th>
+                    <th>Estimated budget</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Expected date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plan in plans %}
+                <tr>
+                    <td>
+                        <strong>{{ plan.title }}</strong>
+                    </td>
+                    <td>{{ plan.department }}</td>
+                    <td>{{ plan.estimated_budget|floatformat:2 }}</td>
+                    <td>{{ plan.get_priority_display }}</td>
+                    <td>{{ plan.get_status_display }}</td>
+                    <td>
+                        {{ plan.expected_date|default:"Not set" }}
+                    </td>
+                    <td>
+                        <a href="{% url 'procurement:detail' plan.pk %}">
+                            View
+                        </a>
+                        {% if can_manage %}
+                        |
+                        <a href="{% url 'procurement:update' plan.pk %}">
+                            Edit
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No procurement plans match your search.</p>
+    {% if can_manage %}
+    <a href="{% url 'procurement:create' %}">
+        Create your first plan
+    </a>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

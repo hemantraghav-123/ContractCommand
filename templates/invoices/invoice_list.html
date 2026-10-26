@@ -1,0 +1,73 @@
+
+{% extends "contracts/base.html" %}
+
+{% block title %}Invoices | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Invoice Management</h1>
+<p class="muted">Track submitted invoices, approvals, and payment status.</p>
+
+<div class="module">
+    <p class="muted">Total invoiced in current results (excluding rejected)</p>
+    <h2>{{ total_invoiced|floatformat:2 }}</h2>
+</div>
+
+<form method="get" class="module">
+    <label for="q">Search</label>
+    <input id="q" type="search" name="q" value="{{ query }}"
+           placeholder="Invoice or contract number, contract title, vendor">
+
+    <label for="status">Status</label>
+    <select id="status" name="status">
+        <option value="">All statuses</option>
+        {% for value, label in status_choices %}
+            <option value="{{ value }}"
+                {% if selected_status == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filter</button>
+    <a href="{% url 'invoices:list' %}">Clear</a>
+</form>
+
+{% if can_submit %}
+    <p><a href="{% url 'invoices:create' %}">+ Submit invoice</a></p>
+{% endif %}
+
+<div class="module" style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Contract</th>
+                <th>Vendor</th>
+                <th>Amount</th>
+                <th>Invoice date</th>
+                <th>Due date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td>
+                        <a href="{% url 'invoices:detail' invoice.pk %}">
+                            {{ invoice.invoice_number }}
+                        </a>
+                    </td>
+                    <td>{{ invoice.contract.contract_number }}</td>
+                    <td>{{ invoice.contract.vendor.name }}</td>
+                    <td>{{ invoice.amount|floatformat:2 }}</td>
+                    <td>{{ invoice.invoice_date }}</td>
+                    <td>{{ invoice.due_date|default:"Not set" }}</td>
+                    <td>{{ invoice.get_status_display }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">No invoices found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

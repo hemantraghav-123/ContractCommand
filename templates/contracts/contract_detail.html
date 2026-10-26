@@ -1,0 +1,94 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}{{ contract.contract_number }} | ContractCommand{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="actions" style="justify-content:space-between">
+        <div>
+            <h1>{{ contract.title }}</h1>
+            <p class="muted">{{ contract.contract_number }}</p>
+        </div>
+
+        <div class="actions">
+            {% if can_manage and not contract.is_archived %}
+            <a class="button" href="{% url 'contracts:update' contract.pk %}">
+                Edit Contract
+            </a>
+
+            <form method="post" action="{% url 'contracts:archive' contract.pk %}"
+                onsubmit="return confirm('Archive this contract?');">
+                {% csrf_token %}
+                <button class="button danger" type="submit">
+                    Archive
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if contract.is_archived %}
+    <p><strong>Archived contract</strong></p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Contract Details</h2>
+
+    <dl class="details">
+        <div>
+            <dt>Contract Number</dt>
+            <dd>{{ contract.contract_number }}</dd>
+        </div>
+        <div>
+            <dt>Vendor</dt>
+            <dd>{{ contract.vendor.name }}</dd>
+        </div>
+        <div>
+            <dt>Contract Type</dt>
+            <dd>{{ contract.get_contract_type_display }}</dd>
+        </div>
+        <div>
+            <dt>Contract Value (INR)</dt>
+            <dd>{{ contract.contract_value|floatformat:2 }}</dd>
+        </div>
+        <div>
+            <dt>Start Date</dt>
+            <dd>{{ contract.start_date|date:"d M Y" }}</dd>
+        </div>
+        <div>
+            <dt>End Date</dt>
+            <dd>{{ contract.end_date|date:"d M Y" }}</dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>{{ contract.get_status_display }}</dd>
+        </div>
+        <div>
+            <dt>Managed By</dt>
+            <dd>{{ contract.managed_by.username }}</dd>
+        </div>
+        <div>
+            <dt>Procurement Plan</dt>
+            <dd>
+                {% if contract.procurement_plan %}
+                {{ contract.procurement_plan.title }}
+                {% else %}
+                Not linked
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt>Created</dt>
+            <dd>{{ contract.created_at|date:"d M Y, H:i" }}</dd>
+        </div>
+    </dl>
+
+    <h3>Description</h3>
+    <p>{{ contract.description|default:"No description provided."|linebreaksbr }}</p>
+
+    <a class="button secondary" href="{% url 'contracts:list' %}">
+        Back to Contracts
+    </a>
+</section>
+{% endblock %}

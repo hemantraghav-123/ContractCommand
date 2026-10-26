@@ -1,0 +1,33 @@
+
+{% extends "contracts/base.html" %}
+
+{% block title %}{{ page_title }} | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>{{ page_title }}</h1>
+
+<p class="muted">
+    New payment records begin as pending. Confirm completion only after
+    the real payment has been made and verified.
+</p>
+
+<div class="module">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+            <div style="margin-bottom: 16px;">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                    <p role="alert">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Record pending payment</button>
+        <a href="{% url 'payments:list' %}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

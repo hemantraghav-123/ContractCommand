@@ -45,7 +45,7 @@ class ProcurementPlan(models.Model):
         on_delete=models.PROTECT,
         related_name="procurement_plans",
     )
-
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

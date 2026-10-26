@@ -1,0 +1,82 @@
+{% extends "contracts/base.html" %}
+
+{% block title %}Vendors | ContractCommand{% endblock %}
+
+{% block content %}
+<h1>Vendor Repository</h1>
+<p class="muted">Manage supplier profiles and qualification status.</p>
+
+<form method="get" class="module">
+    <label for="q">Search vendors</label>
+    <input id="q" name="q" type="search" value="{{ query }}" placeholder="Code, name, category, or country">
+
+    <label for="qualification">Qualification</label>
+    <select id="qualification" name="qualification">
+        <option value="">All qualification statuses</option>
+        {% for value, label in qualification_choices %}
+        {% if selected_qualification == value %}
+        <option value="{{ value }}" selected>{{ label }}</option>
+        {% else %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
+
+    <label for="active">Activity</label>
+    <select id="active" name="active">
+        <option value="">All vendors</option>
+        {% if selected_active == "yes" %}
+        <option value="yes" selected>Active</option>
+        {% else %}
+        <option value="yes">Active</option>
+        {% endif %}
+        {% if selected_active == "no" %}
+        <option value="no" selected>Inactive</option>
+        {% else %}
+        <option value="no">Inactive</option>
+        {% endif %}
+    </select>
+
+    <button type="submit">Filter</button>
+    <a href="{% url 'vendors:list' %}">Clear</a>
+</form>
+
+{% if can_manage %}
+<p><a href="{% url 'vendors:create' %}">+ Register vendor</a></p>
+{% endif %}
+
+<div class="module" style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Vendor code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Country</th>
+                <th>Qualification</th>
+                <th>Activity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendor in vendors %}
+            <tr>
+                <td>{{ vendor.vendor_code }}</td>
+                <td>{{ vendor.name }}</td>
+                <td>{{ vendor.category }}</td>
+                <td>{{ vendor.country }}</td>
+                <td>{{ vendor.get_qualification_status_display }}</td>
+                <td>{% if vendor.is_active %}Active{% else %}Inactive{% endif %}</td>
+                <td>
+                    <a href="{% url 'vendors:detail' vendor.pk %}">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No matching vendors found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
