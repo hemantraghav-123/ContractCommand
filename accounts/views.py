@@ -144,10 +144,16 @@ def forgot_password(request):
                     if "@" in user.email
                     else user.email
                 )
-                messages.success(
-                    request,
-                    f"Verification code sent to {masked_email}. Please check your email inbox.",
-                )
+                if not getattr(settings, "EMAIL_HOST_USER", None) or "console" in getattr(settings, "EMAIL_BACKEND", ""):
+                    messages.info(
+                        request,
+                        f"SMTP email is not yet configured in your Render environment variables. Your 6-digit code is: {code} (Also printed in Render server logs).",
+                    )
+                else:
+                    messages.success(
+                        request,
+                        f"Verification code sent to {masked_email}. Please check your email inbox.",
+                    )
             except Exception as e:
                 logger.error("Failed to send verification code email: %s", e)
                 # Show helpful notification in case SMTP credentials are not yet configured on Render
