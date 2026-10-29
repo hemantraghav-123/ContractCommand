@@ -1,327 +1,391 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "contracts/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}Dashboard | ContractCommand{% endblock %}
 
-    <title>Dashboard | ContractCommand</title>
+{% block content %}
+<style>
+    /* ==========================================================================
+       DASHBOARD COMMAND CENTER STYLES
+       ========================================================================== */
+    .dashboard-hero {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.08) 100%), var(--bg-card);
+        border: 1px solid var(--border-hover);
+        border-radius: var(--radius-lg);
+        padding: 2.25rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px -10px var(--primary-glow);
+    }
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            color: #172033;
-            line-height: 1.6;
-        }
+    .hero-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
 
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 18px 6%;
-            background: #17365d;
-            color: white;
-        }
+    .role-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        background: rgba(99, 102, 241, 0.18);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        color: #a5b4fc;
+        border-radius: var(--radius-full);
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.6rem;
+        background: linear-gradient(120deg, #ffffff 40%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-        .logout-form {
-            margin: 0;
-        }
+    [data-theme="light"] .hero-title {
+        background: linear-gradient(120deg, #0f172a 40%, #475569 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-        .logout-button {
-            padding: 10px 15px;
-            background: white;
-            color: #17365d;
-            border: 0;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
+    .hero-desc {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        max-width: 680px;
+        line-height: 1.6;
+    }
 
-        .logout-button:hover {
-            background: #e2e8f0;
-        }
+    /* Fast Action Chips */
+    .quick-actions-bar {
+        display: flex;
+        gap: 0.85rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
 
-        main {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    .action-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--text-main);
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition-fast);
+    }
 
-        .welcome,
-        .module {
-            padding: 24px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-        }
+    .action-chip:hover {
+        background: rgba(99, 102, 241, 0.15);
+        border-color: var(--border-hover);
+        transform: translateY(-2px);
+        color: #ffffff;
+        text-decoration: none;
+    }
 
-        .welcome h2 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
+    /* Interactive Module Grid */
+    .module-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
 
-        .welcome p {
-            margin: 10px 0;
-        }
+    .module-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition-smooth);
+        box-shadow: var(--shadow-card);
+    }
 
-        .muted {
-            color: #64748b;
-        }
+    .module-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--card-accent, var(--primary));
+        opacity: 0;
+        transition: var(--transition-fast);
+    }
 
-        .modules {
-            display: grid;
-            grid-template-columns: repeat(auto-fit,
-                    minmax(min(220px, 100%), 1fr));
-            gap: 18px;
-            margin-top: 22px;
-        }
+    .module-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--card-accent, var(--border-hover));
+        box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px var(--card-glow, var(--primary-glow));
+        background: var(--bg-card-hover);
+        text-decoration: none;
+    }
 
-        .module {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    .module-card:hover::after {
+        opacity: 1;
+    }
 
-        .module h3 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
+    .module-card:hover .module-arrow {
+        transform: translateX(6px);
+        color: var(--card-accent, var(--primary));
+    }
 
-        .module p {
-            margin-top: 0;
-            margin-bottom: 18px;
-        }
+    .module-icon-wrap {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+        background: var(--card-icon-bg, rgba(99, 102, 241, 0.12));
+        color: var(--card-accent, var(--primary));
+        border: 1px solid var(--card-border, rgba(99, 102, 241, 0.25));
+        transition: var(--transition-smooth);
+    }
 
-        .module a {
-            display: inline-block;
-            margin-top: auto;
-            color: #1d4ed8;
-            font-weight: bold;
-            text-decoration: none;
-        }
+    .module-card:hover .module-icon-wrap {
+        transform: scale(1.1) rotate(-3deg);
+        box-shadow: 0 0 20px var(--card-glow, var(--primary-glow));
+    }
 
-        .module a:hover {
-            text-decoration: underline;
-        }
+    .module-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+    }
 
-        .module-status {
-            display: inline-block;
-            margin-top: auto;
-            padding: 5px 10px;
-            background: #f1f5f9;
-            color: #64748b;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+    .module-text {
+        font-size: 0.92rem;
+        color: var(--text-muted);
+        line-height: 1.55;
+        margin-bottom: 1.5rem;
+    }
 
-        footer {
-            padding: 20px;
-            text-align: center;
-            color: #64748b;
-            font-size: 13px;
-        }
+    .module-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-subtle);
+        margin-top: auto;
+    }
 
-        @media (max-width: 600px) {
-            header {
-                padding: 16px 20px;
-            }
+    .module-cta {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--card-accent, var(--primary));
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
 
-            header h1 {
-                font-size: 19px;
-            }
+    .module-arrow {
+        transition: var(--transition-fast);
+        font-size: 1.1rem;
+    }
+</style>
 
-            main {
-                margin: 24px auto;
-                padding: 0 16px;
-            }
+<!-- Welcome Hero Command Center -->
+<div class="dashboard-hero">
+    <div class="hero-content">
+        <div class="hero-badge-row">
+            <span class="role-pill">
+                <i class="ri-shield-user-line"></i> {{ role }}
+            </span>
+            <span class="status-badge success">
+                <span class="pulse-indicator"></span> System Online
+            </span>
+        </div>
 
-            .welcome,
-            .module {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
+        <h1 class="hero-title">Welcome back, {{ username }}!</h1>
+        <p class="hero-desc">
+            Your centralized defense contract, procurement, vendor, and financial management command center. Access all operations with rapid live metrics and audit tracking below.
+        </p>
 
-<body>
+        <!-- Fast Action Bar -->
+        <div class="quick-actions-bar">
+            <a href="{% url 'contracts:create' %}" class="action-chip">
+                <i class="ri-add-circle-line" style="color: var(--primary);"></i>
+                <span>Create Contract</span>
+            </a>
+            <a href="{% url 'procurement:create' %}" class="action-chip">
+                <i class="ri-file-add-line" style="color: var(--accent-cyan);"></i>
+                <span>New Procurement Plan</span>
+            </a>
+            <a href="{% url 'vendors:create' %}" class="action-chip">
+                <i class="ri-user-add-line" style="color: var(--accent-emerald);"></i>
+                <span>Register Vendor</span>
+            </a>
+            <a href="{% url 'invoices:create' %}" class="action-chip">
+                <i class="ri-bill-line" style="color: var(--accent-amber);"></i>
+                <span>Submit Invoice</span>
+            </a>
+            <a href="{% url 'reports:dashboard' %}" class="action-chip">
+                <i class="ri-bar-chart-box-line" style="color: var(--accent-rose);"></i>
+                <span>Executive Reports</span>
+            </a>
+        </div>
+    </div>
+</div>
 
-    <header>
-        <h1>ContractCommand</h1>
+<!-- Section Title -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <div>
+        <h2 style="font-size: 1.45rem; font-weight: 800;">Command Modules</h2>
+        <p class="muted">Select any operational module to manage records, lifecycle stages, and reports.</p>
+    </div>
+</div>
 
-        <form class="logout-form" method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-
-            <button class="logout-button" type="submit">
-                Log out
-            </button>
-        </form>
-    </header>
-
-    <main>
-
-        <!-- Welcome Section -->
-        <section class="welcome">
-            <h2>Welcome, {{ username }}!</h2>
-
-            <p class="muted">
-                Your ContractCommand procurement and contract management workspace.
+<!-- Interactive Module Cards Grid -->
+<div class="module-grid">
+    <!-- Contracts Module -->
+    <a href="{% url 'contracts:list' %}" class="module-card" 
+       style="--card-accent: #6366f1; --card-glow: rgba(99, 102, 241, 0.4); --card-icon-bg: rgba(99, 102, 241, 0.12); --card-border: rgba(99, 102, 241, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-file-text-line"></i>
+            </div>
+            <h3 class="module-title">Contract Repository</h3>
+            <p class="module-text">
+                Create, review, search, update, and manage defense contracts across all lifecycle stages.
             </p>
-
-            <p>
-                <strong>Role:</strong>
-                {{ role }}
-            </p>
-
-            <p>
-                You are successfully logged in. Use the modules below
-                to access the available features of ContractCommand.
-                Your access to management operations depends on your
-                assigned role and permissions.
-            </p>
-        </section>
-
-        <!-- Application Modules -->
-        <section class="modules">
-
-            <!-- Contracts Module -->
-            <article class="module">
-                <h3>Contracts</h3>
-
-                <p class="muted">
-                    Create, review, search, update, and manage contract
-                    records throughout their lifecycle.
-                </p>
-
-                <a href="{% url 'contracts:list' %}">
-                    Open Contract Repository &rarr;
-                </a>
-            </article>
-
-            <!-- Procurement Module -->
-            <article class="module">
-                <h3>Procurement</h3>
-
-                <p class="muted">
-                    Plan procurement requirements, manage budgets,
-                    and track purchasing priorities.
-                </p>
-
-                <span class="module-status">
-                    Coming in a later phase
-                </span>
-            </article>
-
-            <!-- Vendors Module -->
-            <article class="module">
-                <h3>Vendors</h3>
-
-                <p class="muted">
-                    Maintain vendor profiles and support vendor
-                    qualification and evaluation.
-                </p>
-
-                <span class="module-status">
-                    Coming in a later phase
-                </span>
-            </article>
-
-            <!-- Finance Module -->
-            <article class="module">
-                <h3>Finance</h3>
-
-                <p class="muted">
-                    Track contract invoices, payment records,
-                    and financial processing.
-                </p>
-
-                <span class="module-status">
-                    Coming in a later phase
-                </span>
-            </article>
-
-
-            <article class="module">
-                <h3>Procurement Planning</h3>
-                <p class="muted">
-                    Plan requirements, monitor estimated budgets, and track priorities.
-                </p>
-                <a href="{% url 'procurement:list' %}">
-                    Open Procurement Plans
-                </a>
-            </article>
-
-
-            <article class="module">
-                <h3>Vendor Management</h3>
-                <p class="muted">
-                    Register suppliers, review qualifications, and maintain vendor profiles.
-                </p>
-                <a href="{% url 'vendors:list' %}">Open Vendor Repository</a>
-            </article>
-
-            <article class="module">
-                <h3>Vendor Evaluation</h3>
-                <p class="muted">
-                    Score vendors and compare evaluation results for procurement plans.
-                </p>
-                <a href="{% url 'evaluations:list' %}">Open Evaluations</a>
-            </article>
-
-            
-<article class="module">
-    <h3>Invoice Management</h3>
-    <p class="muted">
-        Submit invoices, review approvals, and track outstanding balances.
-    </p>
-    <a href="{% url 'invoices:list' %}">Open Invoices</a>
-</article>
-
-<article class="module">
-    <h3>Payment Management</h3>
-    <p class="muted">
-        Record payment references and confirm completed payments.
-    </p>
-    <a href="{% url 'payments:list' %}">Open Payments</a>
-</article>
-
-
-<article class="module">
-    <h3>Executive Dashboard & Reports</h3>
-    <p class="muted">
-        Review KPIs, contract values, procurement budgets, and financial
-        summaries.
-    </p>
-    <a href="{% url 'reports:dashboard' %}">
-        Open Executive Dashboard
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Open Contracts</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
     </a>
-</article>
 
+    <!-- Procurement Module -->
+    <a href="{% url 'procurement:list' %}" class="module-card" 
+       style="--card-accent: #06b6d4; --card-glow: rgba(6, 182, 212, 0.4); --card-icon-bg: rgba(6, 182, 212, 0.12); --card-border: rgba(6, 182, 212, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-shopping-bag-3-line"></i>
+            </div>
+            <h3 class="module-title">Procurement Planning</h3>
+            <p class="module-text">
+                Plan requirements, monitor estimated budgets, assign priorities, and link procurement items.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">View Plans</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
 
+    <!-- Vendor Management -->
+    <a href="{% url 'vendors:list' %}" class="module-card" 
+       style="--card-accent: #10b981; --card-glow: rgba(16, 185, 129, 0.4); --card-icon-bg: rgba(16, 185, 129, 0.12); --card-border: rgba(16, 185, 129, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-building-4-line"></i>
+            </div>
+            <h3 class="module-title">Vendor Management</h3>
+            <p class="module-text">
+                Register authorized suppliers, verify compliance, update contact details, and review qualifications.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Explore Vendors</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
 
+    <!-- Vendor Evaluations -->
+    <a href="{% url 'evaluations:list' %}" class="module-card" 
+       style="--card-accent: #8b5cf6; --card-glow: rgba(139, 92, 246, 0.4); --card-icon-bg: rgba(139, 92, 246, 0.12); --card-border: rgba(139, 92, 246, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-scales-3-line"></i>
+            </div>
+            <h3 class="module-title">Vendor Evaluations</h3>
+            <p class="module-text">
+                Perform objective scoring, analyze vendor performance metrics, and compare bids side-by-side.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Review Evaluations</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
 
+    <!-- Invoice Management -->
+    <a href="{% url 'invoices:list' %}" class="module-card" 
+       style="--card-accent: #f59e0b; --card-glow: rgba(245, 158, 11, 0.4); --card-icon-bg: rgba(245, 158, 11, 0.12); --card-border: rgba(245, 158, 11, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-receipt-line"></i>
+            </div>
+            <h3 class="module-title">Invoice Management</h3>
+            <p class="module-text">
+                Submit supplier invoices, route through review approvals, and monitor pending balances.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Process Invoices</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
 
-        </section>
+    <!-- Payment Processing -->
+    <a href="{% url 'payments:list' %}" class="module-card" 
+       style="--card-accent: #14b8a6; --card-glow: rgba(20, 184, 166, 0.4); --card-icon-bg: rgba(20, 184, 166, 0.12); --card-border: rgba(20, 184, 166, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-bank-card-line"></i>
+            </div>
+            <h3 class="module-title">Payment Management</h3>
+            <p class="module-text">
+                Record disbursement references, confirm settlement dates, and audit paid voucher records.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Audit Payments</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
 
-    </main>
-
-    <footer>
-        &copy; {% now "Y" %} ContractCommand. All rights reserved.
-    </footer>
-
-</body>
-
-</html>
+    <!-- Executive Dashboard & Reports -->
+    <a href="{% url 'reports:dashboard' %}" class="module-card" 
+       style="--card-accent: #f43f5e; --card-glow: rgba(244, 63, 94, 0.4); --card-icon-bg: rgba(244, 63, 94, 0.12); --card-border: rgba(244, 63, 94, 0.3);">
+        <div>
+            <div class="module-icon-wrap">
+                <i class="ri-pie-chart-2-line"></i>
+            </div>
+            <h3 class="module-title">Executive Reports</h3>
+            <p class="module-text">
+                High-level operational KPIs, budget allocations, contract value charts, and CSV data export.
+            </p>
+        </div>
+        <div class="module-footer">
+            <span class="module-cta">Open Analytics</span>
+            <i class="ri-arrow-right-line module-arrow"></i>
+        </div>
+    </a>
+</div>
+{% endblock %}

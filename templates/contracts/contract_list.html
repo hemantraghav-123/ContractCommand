@@ -3,27 +3,29 @@
 {% block title %}Contracts | ContractCommand{% endblock %}
 
 {% block content %}
-<section class="panel">
-    <div class="actions" style="justify-content:space-between">
-        <div>
-            <h1>Contract Repository</h1>
-            <p class="muted">
-                Search and manage contract records.
-            </p>
-        </div>
-
-        {% if can_manage %}
-        <a class="button" href="{% url 'contracts:create' %}">
-            + New Contract
-        </a>
-        {% endif %}
+<section class="panel" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1>Contract Repository</h1>
+        <p class="muted">
+            Search, filter, and track defense contract agreements and lifecycle milestones.
+        </p>
     </div>
+
+    {% if can_manage %}
+    <a class="button" href="{% url 'contracts:create' %}">
+        <i class="ri-add-line"></i>
+        <span>New Contract</span>
+    </a>
+    {% endif %}
 </section>
 
 <section class="panel">
     <form method="get" class="filters">
-        <input type="search" name="q" placeholder="Search number, title or vendor" value="{{ query }}"
-            aria-label="Search contracts">
+        <div style="position: relative; display: flex; align-items: center;">
+            <i class="ri-search-line" style="position: absolute; left: 0.85rem; color: var(--text-dim); pointer-events: none;"></i>
+            <input type="search" name="q" placeholder="Search number, title or vendor..." value="{{ query }}"
+                aria-label="Search contracts" style="padding-left: 2.4rem; min-width: 280px;">
+        </div>
 
         <select name="status" aria-label="Filter by status">
             <option value="">All statuses</option>
@@ -36,11 +38,17 @@
             {% endfor %}
         </select>
 
+        <button class="button" type="submit">
+            <i class="ri-filter-3-line"></i>
+            <span>Filter</span>
+        </button>
 
-        <button class="button" type="submit">Search / Filter</button>
+        {% if query or selected_status %}
         <a class="button secondary" href="{% url 'contracts:list' %}">
-            Clear
+            <i class="ri-close-line"></i>
+            <span>Clear</span>
         </a>
+        {% endif %}
     </form>
 </section>
 
@@ -52,39 +60,57 @@
                     <th>Contract Number</th>
                     <th>Title</th>
                     <th>Vendor</th>
-                    <th>Value (INR)</th>
+                    <th style="text-align: right;">Value (INR)</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th style="text-align: right;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for contract in contracts %}
                 <tr>
-                    <td>{{ contract.contract_number }}</td>
-                    <td>{{ contract.title }}</td>
-                    <td>{{ contract.vendor.name }}</td>
-                    <td>{{ contract.contract_value|floatformat:2 }}</td>
-                    <td>{{ contract.start_date|date:"d M Y" }}</td>
-                    <td>{{ contract.end_date|date:"d M Y" }}</td>
-                    <td>{{ contract.get_status_display }}</td>
+                    <td style="font-weight: 700;">
+                        <a href="{% url 'contracts:detail' contract.pk %}" style="display: inline-flex; align-items: center; gap: 0.45rem; color: var(--primary); text-decoration: none;">
+                            <i class="ri-file-text-line" style="color: var(--text-dim);"></i>
+                            {{ contract.contract_number }}
+                        </a>
+                    </td>
+                    <td style="font-weight: 600;">{{ contract.title }}</td>
                     <td>
-                        <a href="{% url 'contracts:detail' contract.pk %}">
-                            View
-                        </a>
-                        {% if can_manage %}
-                        | <a href="{% url 'contracts:update' contract.pk %}">
-                            Edit
-                        </a>
-                        {% endif %}
+                        <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <i class="ri-building-line" style="color: var(--text-dim); font-size: 0.95rem;"></i>
+                            {{ contract.vendor.name }}
+                        </span>
+                    </td>
+                    <td style="text-align: right; font-weight: 700;">{{ contract.contract_value|floatformat:2 }}</td>
+                    <td style="color: var(--text-muted);">{{ contract.start_date|date:"d M Y" }}</td>
+                    <td style="color: var(--text-muted);">{{ contract.end_date|date:"d M Y" }}</td>
+                    <td>{{ contract.get_status_display }}</td>
+                    <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 0.4rem;">
+                            <a href="{% url 'contracts:detail' contract.pk %}" class="button secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                View
+                            </a>
+                            {% if can_manage %}
+                            <a href="{% url 'contracts:update' contract.pk %}" class="button secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                Edit
+                            </a>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8">
-                        No contracts found. Try changing your search,
-                        or create a new contract if you have permission.
+                    <td colspan="8" style="text-align: center; padding: 3rem 1rem;">
+                        <i class="ri-folder-open-line" style="font-size: 2.5rem; color: var(--text-dim); display: block; margin-bottom: 0.75rem;"></i>
+                        <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.35rem;">No contracts found</p>
+                        <p class="muted" style="margin-bottom: 1.25rem;">Try adjusting your search criteria or create a new contract record.</p>
+                        {% if can_manage %}
+                        <a class="button" href="{% url 'contracts:create' %}" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;">
+                            <i class="ri-add-line"></i> New Contract
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

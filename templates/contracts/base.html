@@ -1,213 +1,1091 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}ContractCommand{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- RemixIcon Vector Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+
     <style>
-        * {
+        /* ==========================================================================
+           MODERN THEME VARIABLES & DESIGN SYSTEM
+           ========================================================================== */
+        :root {
+            --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            
+            /* Dark Theme Default */
+            --bg-body: #0a0d14;
+            --bg-sidebar: #0e1320;
+            --bg-card: rgba(18, 24, 38, 0.75);
+            --bg-card-hover: rgba(26, 35, 56, 0.88);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            --bg-input-focus: rgba(255, 255, 255, 0.08);
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(99, 102, 241, 0.45);
+            --border-focus: #6366f1;
+
+            --primary: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --primary-hover: #4f46e5;
+
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(99, 102, 241, 0.3);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+
+            --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-fast: all 0.15s ease-out;
+        }
+
+        /* Light Theme Toggle Support */
+        [data-theme="light"] {
+            --bg-body: #f4f6fb;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            --bg-input: #f1f5f9;
+            --bg-input-focus: #ffffff;
+
+            --border-subtle: #e2e8f0;
+            --border-hover: rgba(99, 102, 241, 0.45);
+
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-dim: #94a3b8;
+
+            --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 16px 32px -8px rgba(99, 102, 241, 0.18);
+        }
+
+        /* Reset & Base Layout */
+        *, *::before, *::after {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            color: #172033;
-        }
-
-        header {
-            background: #17365d;
-            color: white;
-            padding: 18px 5%;
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(circle at 12% 10%, rgba(99, 102, 241, 0.14) 0px, transparent 45%),
+                radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.10) 0px, transparent 40%),
+                radial-gradient(circle at 50% 90%, rgba(139, 92, 246, 0.08) 0px, transparent 45%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        header a {
-            color: white;
+        /* ==========================================================================
+           SIDEBAR NAVIGATION
+           ========================================================================== */
+        .app-sidebar {
+            width: 270px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s ease, var(--transition-smooth);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0 0.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 1.25rem;
             text-decoration: none;
         }
 
-        nav {
+        .brand-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--primary-gradient);
             display: flex;
-            gap: 18px;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 0 20px var(--primary-glow);
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
         }
 
-        main {
-            max-width: 1200px;
-            margin: 32px auto;
-            padding: 0 20px;
+        .brand-container:hover .brand-badge {
+            transform: scale(1.08) rotate(-4deg);
+            box-shadow: 0 0 26px rgba(99, 102, 241, 0.6);
         }
 
-        .panel {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
-            margin-bottom: 20px;
-        }
-
-        .actions,
-        .filters {
+        .brand-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+        }
+
+        .brand-sub {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+        }
+
+        .nav-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 0.25rem;
+        }
+
+        .nav-sections::-webkit-scrollbar {
+            width: 4px;
+        }
+        .nav-sections::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+
+        .nav-group-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-dim);
+            padding: 0 0.75rem 0.4rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.7rem 0.85rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-item a i {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            transition: var(--transition-fast);
+        }
+
+        .nav-item a:hover {
+            color: var(--text-main);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(4px);
+        }
+
+        .nav-item a:hover i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .nav-item a.active {
+            color: #ffffff;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0.06) 100%);
+            font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item a.active i {
+            color: var(--primary);
+        }
+
+        /* Sidebar Footer / User Profile */
+        .sidebar-footer {
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0.75rem;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.82rem;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .logout-btn-minimal {
+            background: transparent;
+            border: 0;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.35rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .logout-btn-minimal:hover {
+            color: var(--accent-rose);
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        /* ==========================================================================
+           MAIN CONTENT WRAPPER & TOPBAR
+           ========================================================================== */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow-y: auto;
+        }
+
+        .app-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.1rem 2.25rem;
+            background: rgba(14, 19, 32, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .sidebar-toggle-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            padding: 0.4rem 0.6rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .topbar-search {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.55rem 0.9rem;
+            width: 320px;
+            transition: var(--transition-fast);
+        }
+
+        .topbar-search:focus-within {
+            background: var(--bg-input-focus);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .topbar-search i {
+            color: var(--text-dim);
+            font-size: 1rem;
+        }
+
+        .topbar-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.88rem;
+            width: 100%;
+        }
+
+        .search-shortcut {
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            padding: 0.15rem 0.45rem;
+            color: var(--text-dim);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: var(--radius-md);
+            padding: 0.55rem 0.75rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* Container Main Body */
+        main {
+            padding: 2.25rem;
+            max-width: 1380px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ==========================================================================
+           CARD PANELS & VISUAL POLISH
+           ========================================================================== */
+        .panel, .module {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before, .module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transition: 0.75s ease;
+            pointer-events: none;
+        }
+
+        .panel:hover, .module:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: var(--bg-card-hover);
+        }
+
+        .panel:hover::before, .module:hover::before {
+            left: 100%;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 1.85rem;
+            line-height: 1.25;
+            margin-bottom: 0.4rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .muted {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        /* ==========================================================================
+           BUTTONS & ACTIONS
+           ========================================================================== */
+        .actions, .filters {
+            display: flex;
+            gap: 0.85rem;
             align-items: center;
             flex-wrap: wrap;
         }
 
         .button {
-            display: inline-block;
-            background: #17365d;
-            color: white;
-            padding: 10px 14px;
-            border: 0;
-            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            background: var(--primary-gradient);
+            color: #ffffff !important;
+            padding: 0.68rem 1.35rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-decoration: none;
             cursor: pointer;
-            font-size: 14px;
+            box-shadow: 0 4px 16px var(--primary-glow);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.48);
+            filter: brightness(1.1);
+        }
+
+        .button:active {
+            transform: translateY(0) scale(0.98);
         }
 
         .button.secondary {
-            background: #475569;
+            background: var(--bg-input);
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-subtle);
+            box-shadow: none;
+        }
+
+        .button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            color: #ffffff !important;
         }
 
         .button.danger {
-            background: #b91c1c;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
         }
 
-        input,
-        select,
-        textarea {
+        .button.danger:hover {
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.55);
+        }
+
+        /* ==========================================================================
+           FORM INPUTS & CONTROLS
+           ========================================================================== */
+        input, select, textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font: inherit;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.92rem;
+            transition: var(--transition-fast);
+            outline: none;
         }
 
-        .filters input,
-        .filters select {
+        input:focus, select:focus, textarea:focus {
+            background: var(--bg-input-focus);
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        select option {
+            background-color: var(--bg-sidebar);
+            color: var(--text-main);
+        }
+
+        .filters input, .filters select {
             width: auto;
+            min-width: 200px;
         }
 
+        .field {
+            margin-bottom: 1.5rem;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .errorlist {
+            list-style: none;
+            color: var(--accent-rose);
+            font-size: 0.82rem;
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        /* ==========================================================================
+           MODERN TABLES & STATUS BADGES
+           ========================================================================== */
         .table-wrap {
             overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            background: rgba(18, 24, 38, 0.45);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            text-align: left;
         }
 
-        th,
-        td {
-            padding: 13px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
+        th, td {
+            padding: 1.05rem 1.35rem;
+            border-bottom: 1px solid var(--border-subtle);
             white-space: nowrap;
+            font-size: 0.91rem;
         }
 
         th {
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+
+        tbody tr {
+            transition: var(--transition-fast);
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.06);
+            box-shadow: inset 3px 0 0 0 var(--primary);
         }
 
         a {
-            color: #1d4ed8;
+            color: #818cf8;
+            text-decoration: none;
+            transition: var(--transition-fast);
         }
 
-        .field {
-            margin-bottom: 18px;
+        a:hover {
+            color: #a5b4fc;
+            text-decoration: underline;
         }
 
-        .field label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
+        /* Dynamic Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.32rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
         }
 
-        .errorlist {
-            color: #b91c1c;
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.28);
         }
 
-        .messages {
-            padding: 12px;
-            background: #dcfce7;
-            border-radius: 6px;
-            margin-bottom: 16px;
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.28);
         }
 
-        .muted {
-            color: #64748b;
+        .status-badge.danger {
+            background: rgba(244, 63, 94, 0.12);
+            color: var(--accent-rose);
+            border: 1px solid rgba(244, 63, 94, 0.28);
         }
 
+        .status-badge.neutral {
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--text-muted);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+
+        .pulse-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+            display: inline-block;
+            animation: pulse-ring 2.2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 0.9; }
+            50% { transform: scale(1.15); opacity: 0.5; }
+            100% { transform: scale(0.9); opacity: 0.9; }
+        }
+
+        /* Key-Value Details Grid */
         .details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .details > div {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.1rem 1.25rem;
+            transition: var(--transition-fast);
+        }
+
+        .details > div:hover {
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
 
         .details dt {
-            color: #64748b;
-            margin-bottom: 6px;
+            color: var(--text-dim);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
         }
 
         .details dd {
             margin: 0;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-main);
         }
 
-        @media (max-width: 600px) {
-            header {
-                align-items: flex-start;
-            }
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 420px;
+        }
 
-            .filters {
-                align-items: stretch;
-            }
+        .toast-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            background: rgba(18, 24, 38, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-            .filters input,
-            .filters select {
-                width: 100%;
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive Mobile Styles */
+        @media (max-width: 992px) {
+            .app-sidebar {
+                position: fixed;
+                left: -280px;
+                transform: translateX(0);
+            }
+            .app-sidebar.open {
+                transform: translateX(280px);
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            }
+            .sidebar-toggle-btn {
+                display: block;
+            }
+            .topbar-search {
+                width: 200px;
+            }
+            main {
+                padding: 1.5rem 1rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <strong>
-            <a href="{% url 'contracts:list' %}">ContractCommand</a>
-        </strong>
 
-        <nav>
-            <a href="{% url 'contracts:list' %}">Contracts</a>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button class="button secondary" type="submit">
-                    Log out
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar" id="appSidebar">
+        <!-- Brand -->
+        <a href="{% url 'contracts:list' %}" class="brand-container">
+            <div class="brand-badge">
+                <i class="ri-shield-flash-line"></i>
+            </div>
+            <div class="brand-text">
+                <span>ContractCommand</span>
+                <span class="brand-sub">Enterprise Suite</span>
+            </div>
+        </a>
+
+        <!-- Navigation Links -->
+        <div class="nav-sections">
+            <div class="nav-group">
+                <div class="nav-group-label">Overview</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name != 'reports' %}active{% endif %}">
+                            <i class="ri-dashboard-3-line"></i>
+                            <span>Main Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:dashboard' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                            <i class="ri-pie-chart-2-line"></i>
+                            <span>Executive Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Contracts & Procurement</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{% url 'contracts:list' %}" class="{% if request.resolver_match.app_name == 'contracts' %}active{% endif %}">
+                            <i class="ri-file-text-line"></i>
+                            <span>Contracts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'procurement:list' %}" class="{% if request.resolver_match.app_name == 'procurement' %}active{% endif %}">
+                            <i class="ri-shopping-bag-3-line"></i>
+                            <span>Procurement Plans</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Vendors & Evaluations</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{% url 'vendors:list' %}" class="{% if request.resolver_match.app_name == 'vendors' %}active{% endif %}">
+                            <i class="ri-building-4-line"></i>
+                            <span>Vendor Directory</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'evaluations:list' %}" class="{% if request.resolver_match.app_name == 'evaluations' %}active{% endif %}">
+                            <i class="ri-scales-3-line"></i>
+                            <span>Vendor Evaluations</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Financials</div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{% url 'invoices:list' %}" class="{% if request.resolver_match.app_name == 'invoices' %}active{% endif %}">
+                            <i class="ri-receipt-line"></i>
+                            <span>Invoices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payments:list' %}" class="{% if request.resolver_match.app_name == 'payments' %}active{% endif %}">
+                            <i class="ri-bank-card-line"></i>
+                            <span>Payments</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer / User Profile -->
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+                    <div class="user-avatar">
+                        {{ request.user.username|slice:":1"|upper|default:"U" }}
+                    </div>
+                    <div class="user-meta">
+                        <span class="user-name">{{ request.user.username|default:"Active User" }}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-dim);">Authenticated</span>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button class="logout-btn-minimal" type="submit" title="Sign out">
+                        <i class="ri-logout-box-r-line"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- App Main Area -->
+    <div class="app-main">
+        <!-- Topbar -->
+        <header class="app-topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation">
+                    <i class="ri-menu-2-line"></i>
                 </button>
-            </form>
-        </nav>
-    </header>
 
-    <main>
-        {% if messages %}
-        {% for message in messages %}
-        <div class="messages">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
+                <div class="topbar-search">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="liveSearchInput" placeholder="Quick filter table rows..." aria-label="Quick search">
+                    <span class="search-shortcut">/</span>
+                </div>
+            </div>
 
-        {% block content %}{% endblock %}
-    </main>
+            <div class="topbar-right">
+                <a href="{% url 'contracts:create' %}" class="button" style="padding: 0.52rem 1.1rem; font-size: 0.85rem;">
+                    <i class="ri-add-line"></i>
+                    <span>New Contract</span>
+                </a>
+
+                <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+                    <i class="ri-sun-line" id="themeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <main>
+            <!-- Toast Notifications -->
+            {% if messages %}
+            <div class="toast-container" id="toastContainer">
+                {% for message in messages %}
+                <div class="toast-item">
+                    <i class="ri-checkbox-circle-fill" style="color: var(--accent-emerald); font-size: 1.25rem;"></i>
+                    <span style="font-size: 0.9rem; font-weight: 500;">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Interactive Client Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Mobile Sidebar Toggle
+            const sidebar = document.getElementById('appSidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                });
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 992 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            }
+
+            // 2. Dark / Light Theme Toggle with LocalStorage
+            const themeBtn = document.getElementById('themeToggleBtn');
+            const themeIcon = document.getElementById('themeIcon');
+            const currentTheme = localStorage.getItem('contractcommand_theme') || 'dark';
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('contractcommand_theme', theme);
+                if (themeIcon) {
+                    if (theme === 'light') {
+                        themeIcon.className = 'ri-moon-line';
+                    } else {
+                        themeIcon.className = 'ri-sun-line';
+                    }
+                }
+            }
+
+            applyTheme(currentTheme);
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const active = document.documentElement.getAttribute('data-theme');
+                    applyTheme(active === 'dark' ? 'light' : 'dark');
+                });
+            }
+
+            // 3. Quick Table Row Instant Search Filter
+            const liveSearch = document.getElementById('liveSearchInput');
+            if (liveSearch) {
+                // Focus search with '/' shortcut
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === '/' && document.activeElement !== liveSearch && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                        e.preventDefault();
+                        liveSearch.focus();
+                    }
+                });
+
+                liveSearch.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase().trim();
+                    const tableRows = document.querySelectorAll('table tbody tr');
+
+                    tableRows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
+                        if (text.includes(query) || query === '') {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // 4. Auto-Format Table Status Badges with Glowing Pulse Dots
+            const statusKeywords = {
+                success: ['active', 'approved', 'completed', 'paid', 'signed', 'verified', 'high score', 'pass'],
+                warning: ['pending', 'in review', 'submitted', 'draft', 'medium', 'under review', 'progress'],
+                danger: ['archived', 'rejected', 'terminated', 'cancelled', 'expired', 'high risk', 'critical', 'deactivated']
+            };
+
+            const cells = document.querySelectorAll('table td');
+            cells.forEach(cell => {
+                const text = cell.textContent.trim().toLowerCase();
+                
+                // Only style short cell strings that look like statuses
+                if (text.length > 0 && text.length < 22 && !cell.querySelector('a') && !cell.querySelector('button') && !cell.querySelector('input')) {
+                    let matchedCategory = null;
+                    for (const [category, keywords] of Object.entries(statusKeywords)) {
+                        if (keywords.some(kw => text === kw || text.startsWith(kw))) {
+                            matchedCategory = category;
+                            break;
+                        }
+                    }
+
+                    if (matchedCategory) {
+                        const originalText = cell.textContent.trim();
+                        cell.innerHTML = `
+                            <span class="status-badge ${matchedCategory}">
+                                <span class="pulse-indicator"></span>
+                                ${originalText}
+                            </span>
+                        `;
+                    }
+                }
+            });
+
+            // 5. Auto dismiss toast messages after 4 seconds
+            const toasts = document.querySelectorAll('.toast-item');
+            if (toasts.length > 0) {
+                setTimeout(() => {
+                    toasts.forEach(toast => {
+                        toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateX(100%)';
+                        setTimeout(() => toast.remove(), 400);
+                    });
+                }, 4000);
+            }
+        });
+    </script>
 </body>
 
 </html>
